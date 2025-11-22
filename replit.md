@@ -6,7 +6,7 @@ StockMaster is a comprehensive modular Inventory Management System (IMS) built w
 ## Technology Stack
 - **Backend**: Flask 3.0.0 with SQLAlchemy ORM
 - **Frontend**: TailwindCSS 3.x + Alpine.js 3.x
-- **Database**: PostgreSQL (Neon-backed via Replit)
+- **Database**: SQLite (for offline functionality)
 - **Authentication**: Flask-Login with custom authentication
 - **Barcode Scanning**: html5-qrcode library
 
@@ -172,6 +172,7 @@ StockMaster is a comprehensive modular Inventory Management System (IMS) built w
 - 2025-11-22: Initial project setup with all core features
 - 2025-11-22: Implemented all 5 unique features (Smart Predictor, Timeline, Quick Actions, Barcode Scanner, Reorder System)
 - 2025-11-22: Created comprehensive UI with TailwindCSS and Alpine.js
+- 2025-11-22: Switched from PostgreSQL to SQLite for offline functionality and portability
 
 ## Future Enhancements
 - Gmail integration for automated email notifications (low stock alerts, delivery confirmations)

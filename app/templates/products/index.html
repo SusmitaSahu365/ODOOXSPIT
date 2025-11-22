@@ -1,0 +1,182 @@
+{% extends "base.html" %}
+
+{% block title %}Products - StockMaster{% endblock %}
+
+{% block content %}
+<div>
+    <div class="flex justify-between items-center mb-8">
+        <h1 class="text-3xl font-bold text-gray-800">Products</h1>
+        <div class="flex space-x-4">
+            <a href="{{ url_for('products.create') }}" class="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition">
+                <i class="fas fa-plus mr-2"></i> Add Product
+            </a>
+        </div>
+    </div>
+    
+    <div class="bg-white p-6 rounded-lg shadow mb-6">
+        <form method="GET" class="flex flex-wrap gap-4">
+            <input type="text" name="search" value="{{ request.args.get('search', '') }}" placeholder="Search by name, SKU, or barcode..." class="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
+            
+            <select name="category" class="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
+                <option value="">All Categories</option>
+                {% for cat in categories %}
+                <option value="{{ cat.id }}" {% if request.args.get('category') == cat.id|string %}selected{% endif %}>{{ cat.name }}</option>
+                {% endfor %}
+            </select>
+            
+            <button type="submit" class="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition">
+                <i class="fas fa-search mr-2"></i> Search
+            </button>
+            
+            <a href="#" id="scanBarcodeBtn" class="bg-green-600 text-white px-6 py-2 rounded-lg hover:bg-green-700 transition">
+                <i class="fas fa-barcode mr-2"></i> Scan Barcode
+            </a>
+        </form>
+    </div>
+    
+    <div class="bg-white rounded-lg shadow overflow-hidden">
+        <div class="overflow-x-auto">
+            <table class="min-w-full divide-y divide-gray-200">
+                <thead class="bg-gray-50">
+                    <tr>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Product</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">SKU</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Category</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Current Stock</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Min/Ideal</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Days Left</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                    </tr>
+                </thead>
+                <tbody class="bg-white divide-y divide-gray-200">
+                    {% for item in product_data %}
+                    <tr class="hover:bg-gray-50">
+                        <td class="px-6 py-4">
+                            <div class="font-medium text-gray-900">{{ item.product.name }}</div>
+                            <div class="text-sm text-gray-500">{{ item.product.unit_of_measure }}</div>
+                        </td>
+                        <td class="px-6 py-4 text-sm text-gray-900">{{ item.product.sku }}</td>
+                        <td class="px-6 py-4 text-sm text-gray-900">
+                            {% if item.product.category %}
+                            <span class="px-2 py-1 bg-blue-100 text-blue-800 rounded-full text-xs">{{ item.product.category.name }}</span>
+                            {% else %}-{% endif %}
+                        </td>
+                        <td class="px-6 py-4 text-sm font-semibold text-gray-900">{{ item.current_stock }}</td>
+                        <td class="px-6 py-4 text-sm text-gray-500">{{ item.product.minimum_stock }} / {{ item.product.ideal_stock }}</td>
+                        <td class="px-6 py-4 text-sm">
+                            {% if item.days_left %}
+                                <span class="px-2 py-1 {% if item.days_left < 3 %}bg-red-100 text-red-800{% elif item.days_left < 7 %}bg-orange-100 text-orange-800{% else %}bg-green-100 text-green-800{% endif %} rounded-full text-xs font-semibold">
+                                    {{ item.days_left }} days
+                                </span>
+                            {% else %}
+                                <span class="text-gray-400">-</span>
+                            {% endif %}
+                        </td>
+                        <td class="px-6 py-4">
+                            {% if item.needs_reorder %}
+                                <span class="px-3 py-1 bg-red-100 text-red-800 rounded-full text-xs font-semibold">
+                                    <i class="fas fa-exclamation-triangle mr-1"></i> Reorder
+                                </span>
+                            {% else %}
+                                <span class="px-3 py-1 bg-green-100 text-green-800 rounded-full text-xs font-semibold">
+                                    <i class="fas fa-check mr-1"></i> OK
+                                </span>
+                            {% endif %}
+                        </td>
+                        <td class="px-6 py-4 text-sm">
+                            <a href="{{ url_for('products.detail', id=item.product.id) }}" class="text-blue-600 hover:text-blue-800 mr-3">
+                                <i class="fas fa-eye"></i>
+                            </a>
+                            <a href="{{ url_for('products.edit', id=item.product.id) }}" class="text-green-600 hover:text-green-800">
+                                <i class="fas fa-edit"></i>
+                            </a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        
+        {% if products.pages > 1 %}
+        <div class="px-6 py-4 bg-gray-50 border-t border-gray-200 flex justify-between items-center">
+            <div class="text-sm text-gray-700">
+                Showing {{ products.total }} products
+            </div>
+            <div class="flex space-x-2">
+                {% if products.has_prev %}
+                    <a href="{{ url_for('products.index', page=products.prev_num) }}" class="px-4 py-2 bg-white border border-gray-300 rounded-lg hover:bg-gray-50">Previous</a>
+                {% endif %}
+                {% if products.has_next %}
+                    <a href="{{ url_for('products.index', page=products.next_num) }}" class="px-4 py-2 bg-white border border-gray-300 rounded-lg hover:bg-gray-50">Next</a>
+                {% endif %}
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<div id="barcodeScannerModal" class="fixed inset-0 bg-black bg-opacity-50 hidden flex items-center justify-center z-50">
+    <div class="bg-white p-6 rounded-lg shadow-xl max-w-md w-full">
+        <h3 class="text-xl font-bold mb-4">Scan Barcode</h3>
+        <div id="reader" class="mb-4"></div>
+        <button id="closeScannerBtn" class="w-full bg-gray-500 text-white px-4 py-2 rounded-lg hover:bg-gray-600">Close</button>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="https://unpkg.com/html5-qrcode"></script>
+<script>
+    const scanBtn = document.getElementById('scanBarcodeBtn');
+    const modal = document.getElementById('barcodeScannerModal');
+    const closeBtn = document.getElementById('closeScannerBtn');
+    let html5QrCode = null;
+    
+    scanBtn.addEventListener('click', function(e) {
+        e.preventDefault();
+        modal.classList.remove('hidden');
+        startScanner();
+    });
+    
+    closeBtn.addEventListener('click', function() {
+        stopScanner();
+        modal.classList.add('hidden');
+    });
+    
+    function startScanner() {
+        html5QrCode = new Html5Qrcode("reader");
+        html5QrCode.start(
+            { facingMode: "environment" },
+            { fps: 10, qrbox: 250 },
+            onScanSuccess,
+            onScanError
+        );
+    }
+    
+    function stopScanner() {
+        if (html5QrCode) {
+            html5QrCode.stop().then(() => {
+                html5QrCode.clear();
+            });
+        }
+    }
+    
+    function onScanSuccess(decodedText, decodedResult) {
+        stopScanner();
+        modal.classList.add('hidden');
+        fetch(`/products/search-barcode?barcode=${encodeURIComponent(decodedText)}`)
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    window.location.href = `/products/${data.product.id}`;
+                } else {
+                    alert('Product not found with barcode: ' + decodedText);
+                }
+            });
+    }
+    
+    function onScanError(errorMessage) {
+    }
+</script>
+{% endblock %}

@@ -1,0 +1,10 @@
+{% extends "base.html" %}
+{% block content %}
+<div>
+    <div class="flex justify-between mb-8">
+        <h1 class="text-3xl font-bold">Internal Transfers</h1>
+        <a href="{{ url_for('operations.create_transfer') }}" class="bg-blue-600 text-white px-6 py-3 rounded-lg">New Transfer</a>
+    </div>
+    <div class="bg-white rounded-lg shadow"><table class="min-w-full"><thead class="bg-gray-50"><tr><th class="px-6 py-3 text-left">Reference</th><th class="px-6 py-3 text-left">From → To</th><th class="px-6 py-3 text-left">Status</th><th class="px-6 py-3 text-left">Actions</th></tr></thead><tbody>{% for t in transfers.items %}<tr><td class="px-6 py-4">{{ t.reference }}</td><td class="px-6 py-4">{{ t.source_warehouse.name }} → {{ t.dest_warehouse.name }}</td><td class="px-6 py-4"><span class="px-3 py-1 rounded-full text-xs {% if t.status == 'done' %}bg-green-100 text-green-800{% else %}bg-gray-100{% endif %}">{{ t.status.upper() }}</span></td><td class="px-6 py-4"><a href="{{ url_for('operations.edit_transfer', id=t.id) }}" class="text-blue-600"><i class="fas fa-edit"></i></a></td></tr>{% endfor %}</tbody></table></div>
+</div>
+{% endblock %}

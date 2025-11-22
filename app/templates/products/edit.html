@@ -1,0 +1,71 @@
+{% extends "base.html" %}
+
+{% block title %}Edit {{ product.name }} - StockMaster{% endblock %}
+
+{% block content %}
+<div>
+    <div class="mb-8">
+        <a href="{{ url_for('products.detail', id=product.id) }}" class="text-blue-600 hover:text-blue-800">
+            <i class="fas fa-arrow-left mr-2"></i> Back to Product
+        </a>
+        <h1 class="text-3xl font-bold text-gray-800 mt-4">Edit Product</h1>
+    </div>
+    
+    <div class="bg-white p-8 rounded-lg shadow max-w-2xl">
+        <form method="POST" action="{{ url_for('products.edit', id=product.id) }}">
+            {{ form.hidden_tag() }}
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div class="md:col-span-2">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Product Name *</label>
+                    {{ form.name(class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500") }}
+                </div>
+                
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">SKU/Code *</label>
+                    {{ form.sku(class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500") }}
+                </div>
+                
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Barcode</label>
+                    {{ form.barcode(class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500") }}
+                </div>
+                
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Category</label>
+                    {{ form.category_id(class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500") }}
+                </div>
+                
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Unit of Measure *</label>
+                    {{ form.unit_of_measure(class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500") }}
+                </div>
+                
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Minimum Stock *</label>
+                    {{ form.minimum_stock(class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500") }}
+                </div>
+                
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Ideal Stock *</label>
+                    {{ form.ideal_stock(class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500") }}
+                </div>
+                
+                <div class="md:col-span-2">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Description</label>
+                    {{ form.description(class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500", rows=4) }}
+                </div>
+            </div>
+            
+            <div class="mt-6 flex space-x-4">
+                <button type="submit" class="bg-blue-600 text-white px-8 py-3 rounded-lg hover:bg-blue-700 transition font-semibold">
+                    <i class="fas fa-save mr-2"></i> Update Product
+                </button>
+                <a href="{{ url_for('products.detail', id=product.id) }}" class="bg-gray-300 text-gray-700 px-8 py-3 rounded-lg hover:bg-gray-400 transition font-semibold">
+                    Cancel
+                </a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

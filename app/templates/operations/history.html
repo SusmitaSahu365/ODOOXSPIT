@@ -1,0 +1,4 @@
+{% extends "base.html" %}
+{% block content %}
+<div><h1 class="text-3xl font-bold mb-8">Move History</h1><div class="bg-white rounded-lg shadow"><table class="min-w-full"><thead class="bg-gray-50"><tr><th class="px-6 py-3 text-left">Date</th><th class="px-6 py-3 text-left">Product</th><th class="px-6 py-3 text-left">Type</th><th class="px-6 py-3 text-right">Quantity</th><th class="px-6 py-3 text-left">Reference</th></tr></thead><tbody>{% for m in movements.items %}<tr><td class="px-6 py-4">{{ m.created_at.strftime('%Y-%m-%d %H:%M') }}</td><td class="px-6 py-4">{{ m.product.name }}</td><td class="px-6 py-4"><span class="px-2 py-1 rounded-full text-xs">{{ m.operation_type }}</span></td><td class="px-6 py-4 text-right {% if m.quantity > 0 %}text-green-600{% else %}text-red-600{% endif %}">{{ m.quantity }}</td><td class="px-6 py-4">{{ m.reference }}</td></tr>{% endfor %}</tbody></table></div></div>
+{% endblock %}

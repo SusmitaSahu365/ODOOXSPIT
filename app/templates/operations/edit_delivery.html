@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+{% block content %}
+<div x-data="{newLine: {product_id: '', quantity: 0}}">
+    <h1 class="text-3xl font-bold text-gray-800 mb-8">Edit Delivery: {{ delivery.reference }}</h1>
+    <div class="bg-white p-6 rounded-lg shadow">
+        <h2 class="text-xl font-bold mb-4">Delivery Lines</h2>
+        {% if delivery.status == 'draft' %}
+        <div class="mb-4 p-4 bg-blue-50 rounded-lg grid grid-cols-4 gap-4">
+            <select x-model="newLine.product_id" class="col-span-2 px-4 py-2 border rounded-lg"><option value="">Select Product</option>{% for product in products %}<option value="{{ product.id }}">{{ product.name }}</option>{% endfor %}</select>
+            <input type="number" x-model="newLine.quantity" placeholder="Quantity" class="px-4 py-2 border rounded-lg">
+            <button @click="fetch('/operations/deliveries/{{ delivery.id }}/add-line', {method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify(newLine)}).then(r => r.json()).then(d => d.success ? location.reload() : alert(d.error))" class="bg-blue-600 text-white px-4 py-2 rounded-lg">Add</button>
+        </div>
+        <button @click="confirm('Validate delivery?') && fetch('/operations/deliveries/{{ delivery.id }}/validate', {method: 'POST'}).then(() => location.reload())" class="bg-green-600 text-white px-4 py-3 rounded-lg mb-4">Validate Delivery</button>
+        {% endif %}
+        <table class="min-w-full"><thead><tr><th class="text-left">Product</th><th class="text-right">Quantity</th></tr></thead><tbody>{% for line in delivery.lines %}<tr><td>{{ line.product.name }}</td><td class="text-right">{{ line.quantity }}</td></tr>{% endfor %}</tbody></table>
+    </div>
+</div>
+{% endblock %}

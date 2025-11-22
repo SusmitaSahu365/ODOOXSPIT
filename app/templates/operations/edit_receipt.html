@@ -1,0 +1,140 @@
+{% extends "base.html" %}
+
+{% block title %}Edit Receipt - StockMaster{% endblock %}
+
+{% block content %}
+<div x-data="receiptEditor()">
+    <div class="mb-8">
+        <a href="{{ url_for('operations.receipts') }}" class="text-blue-600 hover:text-blue-800">
+            <i class="fas fa-arrow-left mr-2"></i> Back to Receipts
+        </a>
+        <h1 class="text-3xl font-bold text-gray-800 mt-4">Edit Receipt: {{ receipt.reference }}</h1>
+    </div>
+    
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div class="lg:col-span-2">
+            <div class="bg-white p-6 rounded-lg shadow mb-6">
+                <h2 class="text-xl font-bold text-gray-800 mb-4">Receipt Information</h2>
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <p class="text-sm text-gray-600">Supplier</p>
+                        <p class="font-semibold">{{ receipt.supplier_name }}</p>
+                    </div>
+                    <div>
+                        <p class="text-sm text-gray-600">Warehouse</p>
+                        <p class="font-semibold">{{ receipt.warehouse.name }}</p>
+                    </div>
+                    <div>
+                        <p class="text-sm text-gray-600">Status</p>
+                        <span class="px-3 py-1 rounded-full text-xs font-semibold {% if receipt.status == 'done' %}bg-green-100 text-green-800{% else %}bg-gray-100 text-gray-800{% endif %}">
+                            {{ receipt.status.upper() }}
+                        </span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="bg-white p-6 rounded-lg shadow">
+                <h2 class="text-xl font-bold text-gray-800 mb-4">Receipt Lines</h2>
+                
+                {% if receipt.status == 'draft' %}
+                <div class="mb-4 p-4 bg-blue-50 rounded-lg">
+                    <div class="grid grid-cols-4 gap-4">
+                        <select x-model="newLine.product_id" class="col-span-2 px-4 py-2 border border-gray-300 rounded-lg">
+                            <option value="">Select Product</option>
+                            {% for product in products %}
+                            <option value="{{ product.id }}">{{ product.name }} ({{ product.sku }})</option>
+                            {% endfor %}
+                        </select>
+                        <input type="number" x-model="newLine.quantity" placeholder="Quantity" min="0" step="0.01" class="px-4 py-2 border border-gray-300 rounded-lg">
+                        <button @click="addLine()" class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700">
+                            <i class="fas fa-plus"></i> Add
+                        </button>
+                    </div>
+                </div>
+                {% endif %}
+                
+                <table class="min-w-full">
+                    <thead class="border-b">
+                        <tr>
+                            <th class="px-4 py-2 text-left text-sm font-semibold text-gray-600">Product</th>
+                            <th class="px-4 py-2 text-right text-sm font-semibold text-gray-600">Quantity</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for line in receipt.lines %}
+                        <tr class="border-b">
+                            <td class="px-4 py-3">{{ line.product.name }}</td>
+                            <td class="px-4 py-3 text-right">{{ line.quantity }} {{ line.product.unit_of_measure }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        
+        <div>
+            <div class="bg-white p-6 rounded-lg shadow">
+                <h2 class="text-xl font-bold text-gray-800 mb-4">Actions</h2>
+                {% if receipt.status == 'draft' %}
+                <button @click="validateReceipt()" class="w-full bg-green-600 text-white px-4 py-3 rounded-lg hover:bg-green-700 transition mb-3">
+                    <i class="fas fa-check mr-2"></i> Validate Receipt
+                </button>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function receiptEditor() {
+    return {
+        newLine: {
+            product_id: '',
+            quantity: 0
+        },
+        addLine() {
+            if (!this.newLine.product_id || this.newLine.quantity <= 0) {
+                alert('Please select a product and enter a valid quantity');
+                return;
+            }
+            
+            fetch('/operations/receipts/{{ receipt.id }}/add-line', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(this.newLine)
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    location.reload();
+                } else {
+                    alert('Error: ' + data.error);
+                }
+            });
+        },
+        validateReceipt() {
+            if (!confirm('Are you sure you want to validate this receipt? This will update stock levels.')) {
+                return;
+            }
+            
+            fetch('/operations/receipts/{{ receipt.id }}/validate', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    location.reload();
+                } else {
+                    alert('Error: ' + data.error);
+                }
+            });
+        }
+    }
+}
+</script>
+{% endblock %}

@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+
+{% block title %}Create Receipt - StockMaster{% endblock %}
+
+{% block content %}
+<div>
+    <div class="mb-8">
+        <a href="{{ url_for('operations.receipts') }}" class="text-blue-600 hover:text-blue-800">
+            <i class="fas fa-arrow-left mr-2"></i> Back to Receipts
+        </a>
+        <h1 class="text-3xl font-bold text-gray-800 mt-4">Create New Receipt</h1>
+    </div>
+    
+    <div class="bg-white p-8 rounded-lg shadow max-w-2xl">
+        <form method="POST" action="{{ url_for('operations.create_receipt') }}">
+            {{ form.hidden_tag() }}
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Reference *</label>
+                    {{ form.reference(class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500") }}
+                </div>
+                
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Supplier Name *</label>
+                    {{ form.supplier_name(class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500") }}
+                </div>
+                
+                <div class="md:col-span-2">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Warehouse *</label>
+                    {{ form.warehouse_id(class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500") }}
+                </div>
+                
+                <div class="md:col-span-2">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Notes</label>
+                    {{ form.notes(class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500", rows=3) }}
+                </div>
+            </div>
+            
+            <div class="mt-6 flex space-x-4">
+                <button type="submit" class="bg-blue-600 text-white px-8 py-3 rounded-lg hover:bg-blue-700 transition font-semibold">
+                    <i class="fas fa-save mr-2"></i> Create Receipt
+                </button>
+                <a href="{{ url_for('operations.receipts') }}" class="bg-gray-300 text-gray-700 px-8 py-3 rounded-lg hover:bg-gray-400 transition font-semibold">
+                    Cancel
+                </a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

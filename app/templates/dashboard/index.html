@@ -1,0 +1,147 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard - StockMaster{% endblock %}
+
+{% block content %}
+<div>
+    <h1 class="text-3xl font-bold text-gray-800 mb-8">Dashboard</h1>
+    
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6 mb-8">
+        <div class="bg-white p-6 rounded-lg shadow">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-sm text-gray-600 mb-1">Total Products</p>
+                    <p class="text-3xl font-bold text-gray-800">{{ stats.total_products }}</p>
+                </div>
+                <div class="bg-blue-100 p-3 rounded-full">
+                    <i class="fas fa-box text-2xl text-blue-600"></i>
+                </div>
+            </div>
+        </div>
+        
+        <div class="bg-white p-6 rounded-lg shadow">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-sm text-gray-600 mb-1">Low Stock Items</p>
+                    <p class="text-3xl font-bold text-red-600">{{ stats.low_stock_count }}</p>
+                </div>
+                <div class="bg-red-100 p-3 rounded-full">
+                    <i class="fas fa-exclamation-triangle text-2xl text-red-600"></i>
+                </div>
+            </div>
+        </div>
+        
+        <div class="bg-white p-6 rounded-lg shadow">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-sm text-gray-600 mb-1">Pending Receipts</p>
+                    <p class="text-3xl font-bold text-green-600">{{ stats.pending_receipts }}</p>
+                </div>
+                <div class="bg-green-100 p-3 rounded-full">
+                    <i class="fas fa-arrow-down text-2xl text-green-600"></i>
+                </div>
+            </div>
+        </div>
+        
+        <div class="bg-white p-6 rounded-lg shadow">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-sm text-gray-600 mb-1">Pending Deliveries</p>
+                    <p class="text-3xl font-bold text-orange-600">{{ stats.pending_deliveries }}</p>
+                </div>
+                <div class="bg-orange-100 p-3 rounded-full">
+                    <i class="fas fa-arrow-up text-2xl text-orange-600"></i>
+                </div>
+            </div>
+        </div>
+        
+        <div class="bg-white p-6 rounded-lg shadow">
+            <div class="flex items-center justify-between">
+                <div>
+                    <p class="text-sm text-gray-600 mb-1">Pending Transfers</p>
+                    <p class="text-3xl font-bold text-purple-600">{{ stats.pending_transfers }}</p>
+                </div>
+                <div class="bg-purple-100 p-3 rounded-full">
+                    <i class="fas fa-exchange-alt text-2xl text-purple-600"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
+        <div class="lg:col-span-2">
+            <div class="bg-white p-6 rounded-lg shadow">
+                <h2 class="text-xl font-bold text-gray-800 mb-4">Recent Operations Timeline</h2>
+                <div class="space-y-3">
+                    {% if recent_operations %}
+                        {% for op in recent_operations %}
+                        <div class="flex items-start space-x-4 p-3 border-l-4 {% if op.operation_type == 'receipt' %}border-green-500{% elif op.operation_type == 'delivery' %}border-orange-500{% elif op.operation_type == 'transfer' %}border-purple-500{% else %}border-gray-500{% endif %} bg-gray-50 rounded">
+                            <div class="flex-shrink-0 w-10 h-10 rounded-full flex items-center justify-center {% if op.operation_type == 'receipt' %}bg-green-100{% elif op.operation_type == 'delivery' %}bg-orange-100{% elif op.operation_type == 'transfer' %}bg-purple-100{% else %}bg-gray-100{% endif %}">
+                                <i class="fas {% if op.operation_type == 'receipt' %}fa-arrow-down text-green-600{% elif op.operation_type == 'delivery' %}fa-arrow-up text-orange-600{% elif op.operation_type == 'transfer' %}fa-exchange-alt text-purple-600{% else %}fa-wrench text-gray-600{% endif %}"></i>
+                            </div>
+                            <div class="flex-1">
+                                <p class="font-semibold text-gray-800">{{ op.operation_type.replace('_', ' ').title() }}</p>
+                                <p class="text-sm text-gray-600">{{ op.description }}</p>
+                                {% if op.product_name %}
+                                <p class="text-sm text-gray-500">{{ op.product_name }} - Qty: {{ op.quantity }}</p>
+                                {% endif %}
+                                <p class="text-xs text-gray-400 mt-1">{{ op.created_at.strftime('%Y-%m-%d %H:%M') }}</p>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    {% else %}
+                        <p class="text-gray-500 text-center py-8">No recent operations</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        
+        <div class="space-y-6">
+            <div class="bg-gradient-to-br from-blue-500 to-blue-600 p-6 rounded-lg shadow text-white">
+                <h2 class="text-xl font-bold mb-4">Quick Actions</h2>
+                <div class="space-y-3">
+                    <a href="{{ url_for('products.create') }}" class="block bg-white bg-opacity-20 hover:bg-opacity-30 transition px-4 py-3 rounded-lg">
+                        <i class="fas fa-plus-circle mr-2"></i> Add Product
+                    </a>
+                    <a href="{{ url_for('operations.create_receipt') }}" class="block bg-white bg-opacity-20 hover:bg-opacity-30 transition px-4 py-3 rounded-lg">
+                        <i class="fas fa-arrow-down mr-2"></i> Create Receipt
+                    </a>
+                    <a href="{{ url_for('operations.create_delivery') }}" class="block bg-white bg-opacity-20 hover:bg-opacity-30 transition px-4 py-3 rounded-lg">
+                        <i class="fas fa-arrow-up mr-2"></i> Create Delivery
+                    </a>
+                    <a href="{{ url_for('operations.create_transfer') }}" class="block bg-white bg-opacity-20 hover:bg-opacity-30 transition px-4 py-3 rounded-lg">
+                        <i class="fas fa-exchange-alt mr-2"></i> Internal Transfer
+                    </a>
+                    <a href="{{ url_for('operations.create_adjustment') }}" class="block bg-white bg-opacity-20 hover:bg-opacity-30 transition px-4 py-3 rounded-lg">
+                        <i class="fas fa-wrench mr-2"></i> Adjustment
+                    </a>
+                </div>
+            </div>
+            
+            <div class="bg-white p-6 rounded-lg shadow">
+                <h2 class="text-xl font-bold text-gray-800 mb-4 flex items-center">
+                    <i class="fas fa-clock text-orange-500 mr-2"></i>
+                    Low Stock Alert (Days Left)
+                </h2>
+                <div class="space-y-3">
+                    {% if low_stock_predictor %}
+                        {% for item in low_stock_predictor %}
+                        <div class="p-3 border border-orange-200 bg-orange-50 rounded-lg">
+                            <p class="font-semibold text-gray-800">{{ item.product.name }}</p>
+                            <div class="flex justify-between items-center mt-1">
+                                <span class="text-sm text-gray-600">Stock: {{ item.current_stock }} {{ item.product.unit_of_measure }}</span>
+                                <span class="px-3 py-1 bg-orange-200 text-orange-800 rounded-full text-xs font-bold">
+                                    {{ item.days_left }} days left
+                                </span>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    {% else %}
+                        <p class="text-gray-500 text-center py-4">All stock levels are healthy</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

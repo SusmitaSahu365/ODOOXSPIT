@@ -1,0 +1,4 @@
+{% extends "base.html" %}
+{% block content %}
+<div><h1 class="text-3xl font-bold mb-8">My Profile</h1><div class="bg-white p-8 rounded-lg shadow max-w-2xl"><div class="grid gap-4"><div><p class="text-sm text-gray-600">Full Name</p><p class="font-semibold">{{ current_user.full_name or current_user.username }}</p></div><div><p class="text-sm text-gray-600">Email</p><p class="font-semibold">{{ current_user.email }}</p></div><div><p class="text-sm text-gray-600">Username</p><p class="font-semibold">{{ current_user.username }}</p></div><div><p class="text-sm text-gray-600">Role</p><p class="font-semibold">{{ current_user.role.replace('_', ' ').title() }}</p></div></div></div></div>
+{% endblock %}

@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>{{ title }}</title>
+
+    <!-- Tailwind CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Alpine JS -->
+    <script src="https://cdn.jsdelivr.net/npm/alpinejs" defer></script>
+</head>
+<body class="bg-gray-900 text-gray-200">
+
+    <!-- Content -->
+    <div class="p-6">
+        {# Flash messages (with categories) - improved look and auto-hide using Alpine.js #}
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                <div class="max-w-3xl mx-auto space-y-3">
+                    {% for category, msg in messages %}
+                        {% set bg = 'bg-blue-600' %}
+                        {% if category == 'success' %}
+                            {% set bg = 'bg-green-600' %}
+                        {% elif category == 'error' %}
+                            {% set bg = 'bg-red-600' %}
+                        {% elif category == 'info' %}
+                            {% set bg = 'bg-indigo-600' %}
+                        {% endif %}
+
+                        <div x-data="{show: true}" x-init="setTimeout(()=>show=false,6000)" x-show="show" class="rounded p-4 text-white {{ bg }} shadow">
+                            <div class="flex items-start">
+                                <div class="flex-1 text-sm">{{ msg }}</div>
+                                <button @click="show=false" class="ml-4 text-xl leading-none">&times;</button>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        {% endwith %}
+
+        {% block content %}{% endblock %}
+    </div>
+
+</body>
+</html>

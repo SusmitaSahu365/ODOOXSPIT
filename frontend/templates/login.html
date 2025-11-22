@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+{% block content %}
+
+<div class="flex justify-center items-center min-h-screen">
+    <form method="POST" 
+          class="bg-gray-800 p-8 rounded-lg w-96 shadow-xl border border-gray-700">
+
+        <h2 class="text-3xl font-bold mb-6 text-center text-red-400">
+            Login
+        </h2>
+
+        <input name="login_id" type="text" placeholder="Login ID"
+               class="w-full mb-4 p-2 rounded bg-gray-700 text-white border border-gray-600"
+               required>
+
+        <input name="password" type="password" placeholder="Password"
+               class="w-full mb-4 p-2 rounded bg-gray-700 text-white border border-gray-600"
+               required>
+
+        <button class="w-full bg-red-500 hover:bg-red-600 text-white py-2 rounded">
+            SIGN IN
+        </button>
+
+        <div class="flex justify-between items-center mt-4">
+            <p class="text-sm text-gray-400">
+                <a href="/signup" class="hover:underline text-red-400">Create Account</a>
+            </p>
+            <p class="text-sm">
+                <a href="/forgot" class="hover:underline text-red-400">Forgot password?</a>
+            </p>
+        </div>
+    </form>
+</div>
+
+{% endblock %}

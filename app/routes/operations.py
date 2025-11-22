@@ -87,6 +87,9 @@ def validate_receipt(id):
     if receipt.status != 'draft':
         return jsonify({'error': 'Receipt already validated'}), 400
     
+    if receipt.lines.count() == 0:
+        return jsonify({'error': 'Cannot validate receipt with no lines'}), 400
+    
     for line in receipt.lines:
         movement = StockMovement(
             product_id=line.product_id,
@@ -197,6 +200,15 @@ def validate_delivery(id):
     if delivery.status != 'draft':
         return jsonify({'error': 'Delivery already validated'}), 400
     
+    if delivery.lines.count() == 0:
+        return jsonify({'error': 'Cannot validate delivery with no lines'}), 400
+    
+    for line in delivery.lines:
+        product = Product.query.get(line.product_id)
+        current_stock = product.get_current_stock(delivery.warehouse_id)
+        if current_stock < line.quantity:
+            return jsonify({'error': f'Insufficient stock for {product.name}. Available: {current_stock}'}), 400
+    
     for line in delivery.lines:
         movement = StockMovement(
             product_id=line.product_id,
@@ -297,6 +309,15 @@ def validate_transfer(id):
     
     if transfer.status != 'draft':
         return jsonify({'error': 'Transfer already validated'}), 400
+    
+    if transfer.lines.count() == 0:
+        return jsonify({'error': 'Cannot validate transfer with no lines'}), 400
+    
+    for line in transfer.lines:
+        product = Product.query.get(line.product_id)
+        current_stock = product.get_current_stock(transfer.source_warehouse_id)
+        if current_stock < line.quantity:
+            return jsonify({'error': f'Insufficient stock for {product.name} in source warehouse. Available: {current_stock}'}), 400
     
     for line in transfer.lines:
         outgoing = StockMovement(
@@ -410,6 +431,9 @@ def validate_adjustment(id):
     
     if adjustment.status != 'draft':
         return jsonify({'error': 'Adjustment already validated'}), 400
+    
+    if adjustment.lines.count() == 0:
+        return jsonify({'error': 'Cannot validate adjustment with no lines'}), 400
     
     for line in adjustment.lines:
         difference = line.difference

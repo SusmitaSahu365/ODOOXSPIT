@@ -28,7 +28,7 @@ class ProductForm(FlaskForm):
     
     def __init__(self, *args, **kwargs):
         super(ProductForm, self).__init__(*args, **kwargs)
-        self.category_id.choices = [(0, 'Select Category')] + [(c.id, c.name) for c in Category.query.all()]
+        self.category_id.choices = [('', 'Select Category')] + [(c.id, c.name) for c in Category.query.all()]
 
 class CategoryForm(FlaskForm):
     name = StringField('Category Name', validators=[DataRequired(), Length(max=100)])
